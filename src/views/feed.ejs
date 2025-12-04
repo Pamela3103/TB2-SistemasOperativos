@@ -1,0 +1,627 @@
+<!doctype html> 
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Inicio – MercaGo</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="mg-body">
+
+  <!-- NAVBAR SUPERIOR -->
+  <header class="mg-navbar">
+    <div class="mg-navbar-left">
+      <span class="mg-logo">MercaGo</span>
+    </div>
+
+    <div class="mg-navbar-center">
+      <input type="text" class="mg-search" placeholder="Buscar tiendas o usuarios...">
+      <div id="searchResults" class="mg-search-results hidden"></div>
+    </div>
+
+    <div class="mg-navbar-right">
+      <button class="mg-icon-btn" id="btnNotif">🔔</button>
+      <button class="mg-icon-btn" id="btnPerfil">👤</button>
+    </div>
+  </header>
+
+  <!-- PANEL DE NOTIFICACIONES -->
+  <div id="notifPanel" class="mg-notif-panel" style="display:none;">
+    <div class="mg-notif-header">
+      <h4>Notificaciones</h4>
+    </div>
+    <div id="notifList" class="mg-notif-list">
+      <!-- Se llena por JS -->
+    </div>
+  </div>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="mg-main">
+    <section class="mg-feed">
+
+      <!-- Título + filtros -->
+      <div class="mg-feed-header">
+        <h2 class="mg-section-title">Actividad en MercaGo</h2>
+        <div class="mg-filter-tabs">
+          <button class="mg-filter-btn mg-filter-btn--active" data-filter="ALL">Todo</button>
+          <button class="mg-filter-btn" data-filter="NEGOCIO">Solo tiendas</button>
+          <button class="mg-filter-btn" data-filter="USUARIO">Solo personas</button>
+        </div>
+      </div>
+
+      <!-- Botón nueva publicación -->
+      <button id="btnNewPost" class="mg-new-post-btn">
+        <img src="/img/add_post.png" alt="nuevo" class="mg-new-post-icon">
+        <span>Nueva publicación</span>
+      </button>
+
+      <% if (posts.length === 0) { %>
+        <p class="mg-empty-text">
+          Aún no hay publicaciones. ¡Sé el primero en compartir algo en MercaGo! 🎉
+        </p>
+      <% } %>
+
+      <% posts.forEach(post => { %>
+        <article class="mg-post-card"
+                 data-tipo="<%= post.authorId && post.authorId.tipoCuenta ? post.authorId.tipoCuenta : 'USUARIO' %>">
+
+          <header class="mg-post-header">
+            <div class="mg-post-avatar">
+              <% if (post.authorId && post.authorId.profilePhoto) { %>
+                <img src="<%= post.authorId.profilePhoto %>" alt="">
+              <% } else { %>
+                <div class="mg-avatar-placeholder">
+                  <%= (post.authorId && post.authorId.username ? post.authorId.username[0].toUpperCase() : "M") %>
+                </div>
+              <% } %>
+            </div>
+
+            <div class="mg-post-meta">
+              <div class="mg-post-author">
+                <%= post.authorId && post.authorId.name ? post.authorId.name : (post.authorId?.username || "Usuario") %>
+              </div>
+              <div class="mg-post-date">
+                <%= new Date(post.createdAt).toLocaleString("es-PE", { dateStyle: "short", timeStyle: "short" }) %>
+              </div>
+            </div>
+          </header>
+
+          <div class="mg-post-content">
+            <p><%= post.content %></p>
+          </div>
+
+          <% if (post.media && post.media.length > 0) { %>
+            <div class="mg-post-media">
+              <% post.media.forEach(url => { %>
+                <img src="<%= url %>" alt="imagen de publicación" class="mg-post-image">
+              <% }) %>
+            </div>
+          <% } %>
+
+          <footer class="mg-post-footer">
+            <div class="mg-post-actions">
+              <button
+                class="mg-action-btn btn-like"
+                data-post-id="<%= post._id %>"
+              >
+                👍 <span><%= post.likesCount %></span>
+              </button>
+              <button
+                class="mg-action-btn btn-comment"
+                data-post-id="<%= post._id %>"
+              >
+                💬 <span><%= post.commentsCount %></span>
+              </button>
+            </div>
+          </footer>
+
+          <!-- BLOQUE DE COMENTARIOS (oculto hasta que se haga click en 💬) -->
+          <div class="mg-comments-block" data-post-id="<%= post._id %>" style="display:none;">
+            <div class="mg-comments-list">
+              <!-- comentarios se cargan por JS -->
+            </div>
+            <div class="mg-comment-new">
+              <input
+                type="text"
+                class="mg-comment-input"
+                placeholder="Escribe un comentario..."
+              />
+              <button class="mg-comment-send">Enviar</button>
+            </div>
+          </div>
+
+        </article>
+      <% }) %>
+    </section>
+  </main>
+
+  <!-- MODAL PARA CREAR POST -->
+  <div id="modalPost" class="mg-modal">
+    <div class="mg-modal-content">
+      <h3>Crear publicación</h3>
+
+      <form id="newPostForm" class="mg-modal-form" enctype="multipart/form-data">
+        <div class="mg-modal-field">
+          <label for="postText">Descripción</label>
+          <textarea
+            id="postText"
+            name="content"
+            class="mg-textarea"
+            rows="3"
+            placeholder="¿Qué deseas compartir?"
+            required
+          ></textarea>
+        </div>
+
+        <div class="mg-modal-field">
+          <label for="postImage">Imagen (opcional)</label>
+          <input
+            id="postImage"
+            type="file"
+            name="image"
+            accept="image/*"
+          />
+        </div>
+
+        <div class="mg-modal-actions">
+          <button type="button" id="cancelPost" class="mg-btn-secondary">Cancelar</button>
+          <button type="submit" id="publishPost" class="mg-btn-primary">Publicar</button>
+        </div>
+
+        <p id="newPostError" class="mg-modal-error" style="display:none;"></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // --------- Verificar login mínimo ----------
+    const currentUserId = sessionStorage.getItem("userId");
+    if (!currentUserId) {
+      window.location.href = "/login";
+    }
+
+    // --------- Filtros ----------
+    const filterButtons = document.querySelectorAll(".mg-filter-btn");
+    const postCards = document.querySelectorAll(".mg-post-card");
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach(b => b.classList.remove("mg-filter-btn--active"));
+        btn.classList.add("mg-filter-btn--active");
+
+        const filtro = btn.dataset.filter;
+
+        postCards.forEach(card => {
+          const tipo = card.dataset.tipo || "USUARIO";
+          card.style.display = (filtro === "ALL" || filtro === tipo) ? "" : "none";
+        });
+      });
+    });
+
+    // --------- Modal "Nueva publicación" ----------
+    const btnNewPost  = document.getElementById("btnNewPost");
+    const modal       = document.getElementById("modalPost");
+    const cancelBtn   = document.getElementById("cancelPost");
+    const formNewPost = document.getElementById("newPostForm");
+    const postTextEl  = document.getElementById("postText");
+    const postImageEl = document.getElementById("postImage");
+    const errorNewPost = document.getElementById("newPostError");
+
+    function abrirModal() {
+      postTextEl.value = "";
+      postImageEl.value = "";
+      errorNewPost.style.display = "none";
+      errorNewPost.textContent = "";
+      modal.classList.add("mg-modal--open");
+    }
+
+    function cerrarModal() {
+      modal.classList.remove("mg-modal--open");
+    }
+
+    btnNewPost.addEventListener("click", () => {
+      if (!currentUserId) {
+        alert("Debes iniciar sesión para publicar.");
+        return;
+      }
+      abrirModal();
+    });
+
+    cancelBtn.addEventListener("click", cerrarModal);
+
+    formNewPost.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const content = postTextEl.value.trim();
+      if (!content) {
+        alert("Escribe algo para publicar.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("authorId", currentUserId);
+      formData.append("content", content);
+      if (postImageEl.files && postImageEl.files[0]) {
+        formData.append("image", postImageEl.files[0]);
+      }
+
+      try {
+        const resp = await fetch("/api/posts", {
+          method: "POST",
+          body: formData
+        });
+
+        const json = await resp.json();
+
+        if (resp.ok) {
+          cerrarModal();
+          location.reload();
+        } else {
+          errorNewPost.style.display = "block";
+          errorNewPost.textContent = json.message || "Error al publicar.";
+          console.error(json);
+        }
+      } catch (err) {
+        console.error(err);
+        errorNewPost.style.display = "block";
+        errorNewPost.textContent = "Error de conexión al publicar.";
+      }
+    });
+
+    // --------- LIKE ----------
+    const likeButtons = document.querySelectorAll(".btn-like");
+
+    likeButtons.forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const postId = btn.dataset.postId;
+        const countSpan = btn.querySelector("span");
+
+        try {
+          const resp = await fetch(`/api/posts/${postId}/like`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: currentUserId })
+          });
+
+          const json = await resp.json();
+
+          if (!resp.ok) {
+            console.error(json);
+            alert(json.message || "Error al procesar el like.");
+            return;
+          }
+
+          countSpan.textContent = json.likesCount;
+          if (json.liked) {
+            btn.classList.add("mg-liked");
+          } else {
+            btn.classList.remove("mg-liked");
+          }
+
+        } catch (err) {
+          console.error(err);
+          alert("Error de conexión al dar like.");
+        }
+      });
+    });
+
+    // --------- COMENTARIOS (mostrar + enviar) ----------
+    async function cargarComentarios(postId, blockEl) {
+      const listEl = blockEl.querySelector(".mg-comments-list");
+      listEl.innerHTML = "<p class='mg-comments-empty'>Cargando...</p>";
+
+      try {
+        const resp = await fetch(`/api/posts/${postId}/comments`);
+        const json = await resp.json();
+
+        if (!resp.ok) {
+          console.error(json);
+          listEl.innerHTML = "<p class='mg-comments-empty'>Error al cargar comentarios.</p>";
+          return;
+        }
+
+        const comments = json.comments || [];
+        if (!comments.length) {
+          listEl.innerHTML = "<p class='mg-comments-empty'>Sé el primero en comentar.</p>";
+          return;
+        }
+
+        listEl.innerHTML = "";
+        comments.forEach(c => {
+          const div = document.createElement("div");
+          div.className = "mg-comment-item";
+          const authorName = c.author && (c.author.name || c.author.username) || "Usuario";
+          const fecha = new Date(c.createdAt).toLocaleString("es-PE", { dateStyle: "short", timeStyle: "short" });
+
+          div.innerHTML = `
+            <div class="mg-comment-header">
+              <span class="mg-comment-author">${authorName}</span>
+              <span class="mg-comment-date">${fecha}</span>
+            </div>
+            <div class="mg-comment-body">
+              ${c.content}
+            </div>
+          `;
+          listEl.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = "<p class='mg-comments-empty'>Error de conexión.</p>";
+      }
+    }
+
+    const commentButtons = document.querySelectorAll(".btn-comment");
+
+    commentButtons.forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const postId = btn.dataset.postId;
+        const block = document.querySelector(`.mg-comments-block[data-post-id="${postId}"]`);
+        if (!block) return;
+
+        const isHidden = block.style.display === "none" || block.style.display === "";
+        if (isHidden) {
+          block.style.display = "block";
+          if (!block.dataset.loaded) {
+            await cargarComentarios(postId, block);
+            block.dataset.loaded = "true";
+          }
+        } else {
+          block.style.display = "none";
+        }
+      });
+    });
+
+    // Enviar comentario
+    const commentBlocks = document.querySelectorAll(".mg-comments-block");
+
+    commentBlocks.forEach(block => {
+      const postId = block.dataset.postId;
+      const input = block.querySelector(".mg-comment-input");
+      const sendBtn = block.querySelector(".mg-comment-send");
+      const listEl = block.querySelector(".mg-comments-list");
+
+      sendBtn.addEventListener("click", async () => {
+        const content = input.value.trim();
+        if (!content) return;
+
+        try {
+          const resp = await fetch(`/api/posts/${postId}/comments`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              authorId: currentUserId,
+              content
+            })
+          });
+
+          const json = await resp.json();
+
+          if (!resp.ok) {
+            console.error(json);
+            alert(json.message || "Error al publicar comentario.");
+            return;
+          }
+
+          input.value = "";
+
+          // Añadir al listado
+          const div = document.createElement("div");
+          div.className = "mg-comment-item";
+          const now = new Date().toLocaleString("es-PE", { dateStyle: "short", timeStyle: "short" });
+          const username = sessionStorage.getItem("username") || "Tú";
+
+          div.innerHTML = `
+            <div class="mg-comment-header">
+              <span class="mg-comment-author">${username}</span>
+              <span class="mg-comment-date">${now}</span>
+            </div>
+            <div class="mg-comment-body">
+              ${content}
+            </div>
+          `;
+          if (listEl.querySelector(".mg-comments-empty")) {
+            listEl.innerHTML = "";
+          }
+          listEl.appendChild(div);
+
+          // actualizar contador en botón 💬
+          const btnComment = document.querySelector(`.btn-comment[data-post-id="${postId}"] span`);
+          if (btnComment && typeof json.commentsCount === "number") {
+            btnComment.textContent = json.commentsCount;
+          }
+
+        } catch (err) {
+          console.error(err);
+          alert("Error de conexión al comentar.");
+        }
+      });
+    });
+
+    // --------- CAMPANITA DE NOTIFICACIONES ----------
+    const btnNotif = document.getElementById("btnNotif");
+    const notifPanel = document.getElementById("notifPanel");
+    const notifList = document.getElementById("notifList");
+    let notifLoaded = false;
+
+    async function cargarNotificaciones() {
+      notifList.innerHTML = "<p class='mg-notif-empty'>Cargando...</p>";
+
+      try {
+        const resp = await fetch(`/api/notifications/${currentUserId}`);
+        const json = await resp.json();
+
+        if (!resp.ok) {
+          console.error(json);
+          notifList.innerHTML = "<p class='mg-notif-empty'>Error al cargar notificaciones.</p>";
+          return;
+        }
+
+        const notifs = json.notifications || [];
+        if (!notifs.length) {
+          notifList.innerHTML = "<p class='mg-notif-empty'>No tienes notificaciones aún.</p>";
+          btnNotif.classList.remove("mg-has-unread");
+          return;
+        }
+
+        notifList.innerHTML = "";
+        let hasUnread = false;
+
+        notifs.forEach(n => {
+          const item = document.createElement("div");
+          item.className = "mg-notif-item" + (n.read ? "" : " mg-notif-unread");
+          if (!n.read) hasUnread = true;
+
+          const fromName =
+            (n.data && n.data.fromUser && (n.data.fromUser.name || n.data.fromUser.username)) ||
+            "Alguien";
+
+          let text;
+          if (n.type === "LIKE")      text = `${fromName} le dio like a tu publicación.`;
+          else if (n.type === "COMMENT") text = `${fromName} comentó tu publicación.`;
+          else if (n.type === "FOLLOW")  text = `${fromName} empezó a seguirte.`;
+          else                          text = "Nueva notificación.";
+
+          const fecha = new Date(n.createdAt).toLocaleString("es-PE", {
+            dateStyle: "short",
+            timeStyle: "short"
+          });
+
+          item.innerHTML = `
+            <div class="mg-notif-text">${text}</div>
+            <div class="mg-notif-date">${fecha}</div>
+          `;
+          notifList.appendChild(item);
+        });
+
+        if (hasUnread) {
+          btnNotif.classList.add("mg-has-unread");
+        } else {
+          btnNotif.classList.remove("mg-has-unread");
+        }
+
+      } catch (err) {
+        console.error(err);
+        notifList.innerHTML = "<p class='mg-notif-empty'>Error de conexión.</p>";
+      }
+    }
+
+    btnNotif.addEventListener("click", async () => {
+      const visible = notifPanel.style.display === "block";
+      if (visible) {
+        notifPanel.style.display = "none";
+        return;
+      }
+
+      notifPanel.style.display = "block";
+
+      if (!notifLoaded) {
+        await cargarNotificaciones();
+        notifLoaded = true;
+      } else {
+        // refrescar cada vez que se abre
+        await cargarNotificaciones();
+      }
+
+      // marcar como leídas
+      fetch(`/api/notifications/${currentUserId}/read`, {
+        method: "POST"
+      }).catch(() => {});
+    });
+
+    // --------- PERFIL ----------
+    const btnPerfil = document.getElementById("btnPerfil");
+    if (btnPerfil) {
+      btnPerfil.addEventListener("click", () => {
+        window.location.href = "/profile";
+      });
+    }
+  </script>
+  <script>
+    const searchInput = document.querySelector(".mg-search");
+    const searchResults = document.getElementById("searchResults");
+
+    let timeoutSearch = null;
+
+    searchInput.addEventListener("input", () => {
+      clearTimeout(timeoutSearch);
+      const q = searchInput.value.trim();
+
+      if (q.length < 2) {
+        searchResults.classList.add("hidden");
+        return;
+      }
+
+      timeoutSearch = setTimeout(() => {
+        buscar(q);
+      }, 200);
+    });
+
+    async function buscar(q) {
+      try {
+        const resp = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        const { stores, users } = await resp.json();
+
+        searchResults.innerHTML = "";
+
+        // Si no hay resultados:
+        if (stores.length === 0 && users.length === 0) {
+          searchResults.innerHTML =
+            "<div class='mg-search-item'>Sin resultados</div>";
+          searchResults.classList.remove("hidden");
+          return;
+        }
+
+        // TIENDAS
+        if (stores.length > 0) {
+          const label = document.createElement("div");
+          label.className = "mg-search-item";
+          label.style.fontWeight = "700";
+          label.textContent = "Tiendas";
+          searchResults.appendChild(label);
+
+          stores.forEach(s => {
+            const item = document.createElement("div");
+            item.className = "mg-search-item";
+            item.textContent = s.name;
+            item.onclick = () => {
+              window.location.href = `/store/${s._id}`;
+            };
+            searchResults.appendChild(item);
+          });
+        }
+
+        // USUARIOS
+        if (users.length > 0) {
+          const label = document.createElement("div");
+          label.className = "mg-search-item";
+          label.style.fontWeight = "700";
+          label.textContent = "Personas";
+          searchResults.appendChild(label);
+
+          users.forEach(u => {
+            const item = document.createElement("div");
+            item.className = "mg-search-item";
+            item.textContent = u.name;
+            item.onclick = () => {
+              window.location.href = `/profile/${u._id}`;
+            };
+            searchResults.appendChild(item);
+          });
+        }
+
+        searchResults.classList.remove("hidden");
+
+      } catch (err) {
+        console.error("Error buscando:", err);
+      }
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!searchInput.contains(e.target)) {
+        searchResults.classList.add("hidden");
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Perfil – MercaGo</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="mg-body">
+
+  <!-- NAVBAR SUPERIOR -->
+  <header class="mg-navbar">
+    <div class="mg-navbar-left">
+      <span class="mg-logo">MercaGo</span>
+    </div>
+    <div class="mg-navbar-center">
+      <input type="text" class="mg-search" placeholder="Buscar tiendas o usuarios...">
+    </div>
+    <div class="mg-navbar-right">
+      <button class="mg-icon-btn" onclick="window.location.href='/feed'">🏠</button>
+      <button class="mg-icon-btn">🔔</button>
+      <button class="mg-icon-btn mg-icon-btn--active">👤</button>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PERFIL -->
+  <main class="mg-main mg-main-profile">
+    <div class="mg-profile-layout">
+
+      <!-- COLUMNA IZQUIERDA: info de usuario -->
+      <section class="mg-profile-card">
+        <div class="mg-profile-header">
+          <div class="mg-profile-avatar">
+            <img id="pAvatar" src="" alt="">
+          </div>
+
+          <div>
+            <h1 class="mg-profile-name" id="pName">Nombre de usuario</h1>
+            <p class="mg-profile-username" id="pUsername">@username</p>
+            <span class="mg-profile-tag" id="pTipo">Tipo de cuenta</span>
+            <p class="mg-profile-bio" id="pBio">Bio...</p>
+          </div>
+        </div>
+
+        <div class="mg-profile-stats">
+          <div>
+            <span id="pPosts" class="mg-profile-stat-number">0</span>
+            <span class="mg-profile-stat-label">Publicaciones</span>
+          </div>
+          <div>
+            <span id="pFollowers" class="mg-profile-stat-number">0</span>
+            <span class="mg-profile-stat-label">Seguidores</span>
+          </div>
+          <div>
+            <span id="pFollowing" class="mg-profile-stat-number">0</span>
+            <span class="mg-profile-stat-label">Siguiendo</span>
+          </div>
+        </div>
+
+        <!-- BOTÓN PRINCIPAL DINÁMICO: EDITAR PERFIL / SEGUIR -->
+        <button id="profile-main-btn" class="mg-profile-btn-primary">
+          <!-- El texto se define por JS -->
+        </button>
+      </section>
+
+      <!-- COLUMNA DERECHA: tienda y posts -->
+      <section class="mg-profile-right">
+
+        <!-- TARJETA DE TIENDA (solo si tiene NEGOCIO) -->
+        <div id="pf-store-card" class="mg-store-card" style="display:none;">
+          <div class="mg-store-header">
+            <h3 id="pf-store-name">Nombre de la tienda</h3>
+            <span class="mg-store-pill">Tienda asociada</span>
+          </div>
+          <p id="pf-store-address" class="mg-store-text"></p>
+          <p id="pf-store-city" class="mg-store-text"></p>
+          <p id="pf-store-phone" class="mg-store-text"></p>
+
+          <button id="pf-store-btn" class="mg-profile-btn-outline">
+            Ver catálogo
+          </button>
+        </div>
+
+        <!-- PUBLICACIONES DEL PERFIL -->
+        <div class="mg-profile-posts">
+          <h3 class="mg-section-title">Publicaciones de este perfil</h3>
+          <div id="pf-posts-list"></div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // 1) Verificar login
+    const loggedUserId = sessionStorage.getItem("userId");
+    if (!loggedUserId) {
+      window.location.href = "/login";
+    }
+
+    // 2) Determinar de qué perfil estamos hablando (propio u otro)
+    //    Asumimos rutas tipo:
+    //    - /profile           -> perfil propio
+    //    - /profile/:id       -> perfil de otro usuario
+    let profileUserId;
+    async function actualizarEstadoFollow(mainBtn, userId) {
+      try {
+        if (userId === loggedUserId) return;
+
+        const resp = await fetch(`/api/follow/status/${userId}?myId=${loggedUserId}`);
+        if (!resp.ok) return;
+
+        const data = await resp.json();
+        mainBtn.textContent = data.isFollowing ? "Siguiendo" : "Seguir";
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+
+    const pathParts = window.location.pathname.split("/").filter(Boolean); // quita vacíos
+
+    if (pathParts[0] === "profile" && pathParts[1]) {
+      // /profile/:id
+      profileUserId = pathParts[1];
+    } else {
+      // /profile (sin id explícito) -> perfil propio
+      profileUserId = loggedUserId;
+    }
+
+    // 3) Cargar perfil completo desde la API
+    async function cargarPerfil() {
+      try {
+        // ahora pedimos el perfil del dueño de la página (profileUserId)
+        const resp = await fetch(`/api/profile/${profileUserId}`);
+        if (!resp.ok) throw new Error("No se pudo cargar el perfil");
+
+        const { user, store, posts } = await resp.json();
+
+        // ----- Usuario -----
+        document.getElementById("pName").textContent = user.name || user.username;
+        document.getElementById("pUsername").textContent = "@" + user.username;
+        document.getElementById("pTipo").textContent =
+          user.tipoCuenta === "NEGOCIO" ? "Cuenta de tienda" : "Cuenta personal";
+        document.getElementById("pBio").textContent =
+          user.bio || "Este usuario aún no ha escrito una bio.";
+
+        document.getElementById("pPosts").textContent =
+          user.postCount || (posts ? posts.length : 0) || 0;
+        document.getElementById("pFollowers").textContent =
+          user.followersCount || 0;
+        document.getElementById("pFollowing").textContent =
+          user.followingCount || 0;
+
+        const avatar = document.getElementById("pAvatar");
+        if (user.profilePhoto) {
+          avatar.src = user.profilePhoto;
+        } else {
+          avatar.src = "https://via.placeholder.com/80?text=" +
+            (user.username || "U")[0].toUpperCase();
+        }
+
+        // ----- BOTÓN PRINCIPAL: EDITAR PERFIL vs SEGUIR -----
+                // ----- BOTÓN PRINCIPAL: EDITAR PERFIL vs SEGUIR -----
+        const mainBtn = document.getElementById("profile-main-btn");
+
+        if (profileUserId === loggedUserId) {
+          // Es mi propio perfil
+          mainBtn.textContent = "Editar perfil";
+          mainBtn.onclick = () => {
+            window.location.href = "/settings/profile";
+          };
+        } else {
+          // Es el perfil de otra persona
+          // Texto por defecto
+          mainBtn.textContent = "Seguir";
+
+          // Consultar estado real en la API
+          await actualizarEstadoFollow(mainBtn, user._id);
+
+          mainBtn.onclick = async () => {
+            try {
+              const yaSigo = mainBtn.textContent === "Siguiendo";
+              const method = yaSigo ? "DELETE" : "POST";
+
+              const resp = await fetch(`/api/follow/${user._id}`, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ myId: loggedUserId }),
+              });
+
+              if (!resp.ok) {
+                const errJson = await resp.json().catch(() => ({}));
+                alert(errJson.message || "No se pudo actualizar el seguimiento");
+                return;
+              }
+
+              // Alternar texto
+              mainBtn.textContent = yaSigo ? "Seguir" : "Siguiendo";
+
+              // Actualizar contador
+              const followersSpan = document.getElementById("pFollowers");
+              let currentFollowers = Number(followersSpan.textContent) || 0;
+              currentFollowers += yaSigo ? -1 : 1;
+              followersSpan.textContent = currentFollowers;
+
+            } catch (e) {
+              console.error(e);
+              alert("Error al intentar seguir a este usuario");
+            }
+          };
+        }
+
+
+
+        // ----- Tienda asociada -----
+        if (store) {
+          const card = document.getElementById("pf-store-card");
+          card.style.display = "block";
+
+          document.getElementById("pf-store-name").textContent = store.name;
+          document.getElementById("pf-store-address").textContent =
+            store.address || "";
+          document.getElementById("pf-store-city").textContent =
+            [store.district, store.city].filter(Boolean).join(" - ");
+          document.getElementById("pf-store-phone").textContent =
+            store.phone ? "Teléfono: " + store.phone : "";
+
+          const btnCatalog = document.getElementById("pf-store-btn");
+          btnCatalog.addEventListener("click", () => {
+            window.location.href = `/store/${store._id}`;
+          });
+        }
+
+        // ----- Posts del usuario -----
+        const list = document.getElementById("pf-posts-list");
+        list.innerHTML = "";
+
+        if (!posts || posts.length === 0) {
+          list.innerHTML =
+            '<p class="mg-empty-text">Aún no hay publicaciones de este perfil.</p>';
+          return;
+        }
+
+        posts.forEach(post => {
+          const created = new Date(post.createdAt).toLocaleString("es-PE", {
+            dateStyle: "short",
+            timeStyle: "short",
+          });
+
+          const card = document.createElement("article");
+          card.className = "mg-post-card";
+
+          card.innerHTML = `
+            <header class="mg-post-header">
+              <div class="mg-post-avatar">
+                ${user.profilePhoto
+                  ? `<img src="${user.profilePhoto}" alt="">`
+                  : `<div class="mg-avatar-placeholder">
+                       ${(user.username || "M")[0].toUpperCase()}
+                     </div>`}
+              </div>
+              <div class="mg-post-meta">
+                <div class="mg-post-author">
+                  ${user.name || user.username}
+                </div>
+                <div class="mg-post-date">
+                  ${created}
+                </div>
+              </div>
+            </header>
+
+            <div class="mg-post-content">
+              <p>${post.content}</p>
+            </div>
+
+            <footer class="mg-post-footer">
+              <div class="mg-post-actions">
+                <button class="mg-action-btn">👍 <span>${post.likesCount || 0}</span></button>
+                <button class="mg-action-btn">💬 <span>${post.commentsCount || 0}</span></button>
+              </div>
+            </footer>
+          `;
+
+          list.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error(err);
+        alert("Error al cargar el perfil");
+      }
+    }
+
+    cargarPerfil();
+  </script>
+
+</body>
+</html>

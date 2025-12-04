@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Catálogo – MercaGo</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="mg-body">
+
+  <!-- NAVBAR SUPERIOR -->
+  <header class="mg-navbar">
+    <div class="mg-navbar-left">
+      <span class="mg-logo">MercaGo</span>
+    </div>
+    <div class="mg-navbar-center">
+      <input type="text" class="mg-search" placeholder="Buscar tiendas o usuarios...">
+    </div>
+    <div class="mg-navbar-right">
+      <button class="mg-icon-btn" onclick="window.location.href='/feed'">🏠</button>
+      <button class="mg-icon-btn">🔔</button>
+      <button class="mg-icon-btn" onclick="window.location.href='/profile'">👤</button>
+    </div>
+  </header>
+
+  <main class="mg-main mg-store-main">
+    <section class="mg-store-layout">
+
+      <!-- INFO PRINCIPAL DE TIENDA -->
+      <div class="mg-store-card">
+        <div class="mg-store-header">
+          <div>
+            <h2 class="mg-store-name" id="stName"></h2>
+            <p class="mg-store-address" id="stAddress"></p>
+            <p class="mg-store-address" id="stCity"></p>
+            <p class="mg-store-phone" id="stPhone"></p>
+          </div>
+
+          <div class="mg-store-header-right">
+            <span class="mg-store-pill">Tienda asociada</span>
+
+            <!-- SOLO DUEÑO -->
+            <button
+              id="btnEditStore"
+              class="mg-profile-btn-outline mg-owner-only"
+            >
+              Editar tienda
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMOCIONES -->
+      <section class="mg-store-promos mg-store-section">
+        <div class="mg-store-section-header">
+          <h3 class="mg-section-title">Promociones</h3>
+
+          <!-- SOLO DUEÑO -->
+          <button
+            id="btnNewPromo"
+            class="mg-store-chip-btn mg-owner-only"
+          >
+            + Agregar promoción
+          </button>
+        </div>
+
+        <div id="stPromosList" class="mg-promos-list"></div>
+      </section>
+
+      <!-- PRODUCTOS -->
+      <section class="mg-store-products mg-store-section">
+        <div class="mg-store-section-header">
+          <h3 class="mg-section-title">Productos</h3>
+
+          <!-- SOLO DUEÑO -->
+          <button
+            id="btnNewProduct"
+            class="mg-store-chip-btn mg-owner-only"
+          >
+            + Agregar producto
+          </button>
+        </div>
+
+        <div id="stProductsList" class="mg-products-grid"></div>
+      </section>
+
+    </section>
+  </main>
+
+  <!-- MODAL PRODUCTO -->
+  <div id="modalProduct" class="mg-modal">
+    <div class="mg-modal-card">
+      <h3 id="modalProductTitle" class="mg-modal-title">Nuevo producto</h3>
+
+      <form id="productForm" class="mg-settings-form" enctype="multipart/form-data">
+        <input type="hidden" id="productId">
+
+        <div>
+          <label class="mg-label">Nombre</label>
+          <input type="text" id="prodName" class="mg-input" required>
+        </div>
+
+        <div>
+          <label class="mg-label">Categoría</label>
+          <input
+            type="text"
+            id="prodCategory"
+            class="mg-input"
+            list="categoryOptions"
+            required
+          >
+          <datalist id="categoryOptions"></datalist>
+        </div>
+
+        <div>
+          <label class="mg-label">Marca</label>
+          <input
+            type="text"
+            id="prodBrand"
+            class="mg-input"
+            list="brandOptions"
+          >
+          <datalist id="brandOptions"></datalist>
+        </div>
+
+        <div>
+          <label class="mg-label">Unidad (ej. kg, L, und)</label>
+          <input type="text" id="prodUnit" class="mg-input">
+        </div>
+
+        <div>
+          <label class="mg-label">Precio</label>
+          <input type="number" step="0.01" id="prodPrice" class="mg-input" required>
+        </div>
+
+        <div>
+          <label class="mg-label">Imagen</label>
+          <input type="file" id="prodImage" class="mg-file" accept="image/*">
+        </div>
+
+        <div class="mg-modal-footer">
+          <button type="button" id="btnCancelProduct" class="mg-btn-secondary">Cancelar</button>
+          <button type="submit" class="mg-btn-primary">Guardar</button>
+        </div>
+
+        <p id="productError" class="mg-modal-error" style="display:none;"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL PROMOCIÓN -->
+  <div id="modalPromo" class="mg-modal">
+    <div class="mg-modal-card">
+      <h3 id="modalPromoTitle" class="mg-modal-title">Nueva promoción</h3>
+
+      <form id="promoForm" class="mg-settings-form">
+        <input type="hidden" id="promoId">
+
+        <div>
+          <label class="mg-label">Título</label>
+          <input type="text" id="promoTitle" class="mg-input" required>
+        </div>
+
+        <div>
+          <label class="mg-label">Producto asociado</label>
+          <select id="promoProduct" class="mg-input" required>
+            <!-- opciones se llenan por JS -->
+          </select>
+        </div>
+
+        <div>
+          <label class="mg-label">Inicio</label>
+          <input type="date" id="promoStart" class="mg-input" required>
+        </div>
+
+        <div>
+          <label class="mg-label">Fin</label>
+          <input type="date" id="promoEnd" class="mg-input" required>
+        </div>
+
+        <div class="mg-modal-footer">
+          <button type="button" id="btnCancelPromo" class="mg-btn-secondary">Cancelar</button>
+          <button type="submit" class="mg-btn-primary">Guardar</button>
+        </div>
+
+        <p id="promoError" class="mg-modal-error" style="display:none;"></p>
+      </form>
+    </div>
+  </div>
+
+    <!-- MODAL EDITAR TIENDA -->
+    <div id="modalStore" class="mg-modal">
+    <div class="mg-modal-card">
+        <h3 class="mg-modal-title">Editar tienda</h3>
+
+        <form id="storeForm" class="mg-modal-form">
+        <div class="mg-modal-field">
+            <label>Nombre</label>
+            <input type="text" id="stNameInput" class="mg-input" required>
+        </div>
+
+        <div class="mg-modal-field">
+            <label>Dirección</label>
+            <input type="text" id="stAddressInput" class="mg-input">
+        </div>
+
+        <div class="mg-modal-field">
+            <label>Distrito</label>
+            <input type="text" id="stDistrictInput" class="mg-input">
+        </div>
+
+        <div class="mg-modal-field">
+            <label>Ciudad</label>
+            <input type="text" id="stCityInput" class="mg-input">
+        </div>
+
+        <div class="mg-modal-field">
+            <label>Teléfono</label>
+            <input type="text" id="stPhoneInput" class="mg-input">
+        </div>
+
+        <div class="mg-modal-footer">
+            <button type="button" id="btnCancelStore" class="mg-btn-secondary">
+            Cancelar
+            </button>
+            <button type="submit" class="mg-btn-primary">
+            Guardar
+            </button>
+        </div>
+
+        <p id="storeError" class="mg-modal-error" style="display:none;"></p>
+        </form>
+    </div>
+    </div>
+
+
+  <script>
+    const loggedUserId = sessionStorage.getItem("userId");
+    if (!loggedUserId) {
+      window.location.href = "/login";
+    }
+
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const storeId = pathParts[1];
+
+    let isOwner = false;
+    let currentStore = null; 
+    let catalogProducts = [];
+    let catalogPromotions = [];
+
+    const modalProduct   = document.getElementById("modalProduct");
+    const modalPromo     = document.getElementById("modalPromo");
+    const productForm    = document.getElementById("productForm");
+    const promoForm      = document.getElementById("promoForm");
+    const productError   = document.getElementById("productError");
+    const promoError     = document.getElementById("promoError");
+    const btnNewProduct  = document.getElementById("btnNewProduct");
+    const btnNewPromo    = document.getElementById("btnNewPromo");
+    const btnCancelProduct = document.getElementById("btnCancelProduct");
+    const btnCancelPromo   = document.getElementById("btnCancelPromo");
+    const btnEditStore   = document.getElementById("btnEditStore");
+
+    const promosListEl   = document.getElementById("stPromosList");
+    const productsListEl = document.getElementById("stProductsList");
+    const catDL          = document.getElementById("categoryOptions");
+    const brandDL        = document.getElementById("brandOptions");
+    const promoProductSelect = document.getElementById("promoProduct");
+
+    const stNameEl    = document.getElementById("stName");
+    const stAddressEl = document.getElementById("stAddress");
+    const stCityEl    = document.getElementById("stCity");
+    const stPhoneEl   = document.getElementById("stPhone");
+
+    function openModal(modal) {
+      modal.classList.add("mg-modal--open");
+    }
+    function closeModal(modal) {
+      modal.classList.remove("mg-modal--open");
+    }
+
+    async function cargarCatalogo() {
+      try {
+        const resp = await fetch(`/api/store/${storeId}/catalog`);
+        if (!resp.ok) throw new Error("No se pudo cargar catálogo");
+
+        const { store, products, promotions } = await resp.json();
+        currentStore = store;
+
+        catalogProducts   = products || [];
+        catalogPromotions = promotions || [];
+
+        // HEADER TIENDA
+        stNameEl.textContent    = store.name || "";
+        stAddressEl.textContent = store.address || "";
+        stCityEl.textContent    =
+          [store.district, store.city].filter(Boolean).join(" - ");
+        stPhoneEl.textContent   =
+          store.phone ? "Teléfono: " + store.phone : "";
+
+        const ownerIdStr = store.ownerId ? String(store.ownerId) : null;
+        isOwner = !!loggedUserId && ownerIdStr === loggedUserId;
+
+        // mostrar / ocultar elementos de dueño
+        document.querySelectorAll(".mg-owner-only").forEach(el => {
+          el.style.display = isOwner ? "" : "none";
+        });
+
+        // ---------- PROMOCIONES ----------
+        promosListEl.innerHTML = "";
+
+        if (!catalogPromotions.length) {
+          promosListEl.innerHTML =
+            "<p class='mg-empty-text'>No hay promociones activas.</p>";
+        } else {
+          catalogPromotions.forEach(p => {
+            const div = document.createElement("div");
+            div.className = "mg-promo-card";
+
+            const start = new Date(p.startsAt).toLocaleDateString("es-PE");
+            const end   = new Date(p.endsAt).toLocaleDateString("es-PE");
+
+            div.innerHTML = `
+              <div class="mg-promo-title">${p.title}</div>
+              <div class="mg-promo-dates">Del ${start} al ${end}</div>
+              ${isOwner ? `
+                <div class="mg-promo-actions">
+                  <button class="mg-link-btn" data-id="${p._id}" data-action="edit">Editar</button>
+                  <button class="mg-link-btn mg-link-btn-danger" data-id="${p._id}" data-action="delete">Eliminar</button>
+                </div>
+              ` : ""}
+            `;
+            promosListEl.appendChild(div);
+          });
+        }
+
+        // ---------- PRODUCTOS ----------
+        productsListEl.innerHTML = "";
+
+        if (!catalogProducts.length) {
+          productsListEl.innerHTML =
+            "<p class='mg-empty-text'>No hay productos en catálogo.</p>";
+        } else {
+          catalogProducts.forEach(pr => {
+            const card = document.createElement("article");
+            card.className = "mg-product-card";
+
+            card.innerHTML = `
+              <div class="mg-product-img-wrapper">
+                ${pr.image
+                  ? `<img src="${pr.image}" alt="${pr.name}">`
+                  : `<div class="mg-product-placeholder">
+                       ${pr.name ? pr.name[0].toUpperCase() : "P"}
+                     </div>`}
+              </div>
+              <div class="mg-product-body">
+                <div class="mg-product-name">${pr.name}</div>
+                <div class="mg-product-meta">
+                  ${pr.brand ? `<span>${pr.brand}</span>` : ""}
+                  ${pr.unit  ? `<span>${pr.unit}</span>`  : ""}
+                </div>
+                <div class="mg-product-price">S/ ${Number(pr.price).toFixed(2)}</div>
+                ${isOwner ? `
+                  <div class="mg-product-actions">
+                    <button class="mg-link-btn" data-id="${pr._id}" data-action="edit">Editar</button>
+                    <button class="mg-link-btn mg-link-btn-danger" data-id="${pr._id}" data-action="delete">Eliminar</button>
+                  </div>
+                ` : ""}
+              </div>
+            `;
+            productsListEl.appendChild(card);
+          });
+        }
+
+        // ---------- DATALISTS ----------
+        catDL.innerHTML = "";
+        brandDL.innerHTML = "";
+
+        const catSet = new Set();
+        const brandSet = new Set();
+
+        catalogProducts.forEach(p => {
+          if (p.category) catSet.add(p.category);
+          if (p.brand)    brandSet.add(p.brand);
+        });
+
+        catSet.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          catDL.appendChild(opt);
+        });
+
+        brandSet.forEach(b => {
+          const opt = document.createElement("option");
+          opt.value = b;
+          brandDL.appendChild(opt);
+        });
+
+        // ---------- SELECT de producto en promos ----------
+        promoProductSelect.innerHTML = "";
+        if (!catalogProducts.length) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "No hay productos registrados";
+          promoProductSelect.appendChild(opt);
+        } else {
+          catalogProducts.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p._id;
+            opt.textContent = `${p.name} – S/ ${Number(p.price).toFixed(2)}`;
+            promoProductSelect.appendChild(opt);
+          });
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Error al cargar catálogo");
+      }
+    }
+
+    // ---------- PRODUCTO ----------
+    function abrirModalProducto(editData) {
+      productError.style.display = "none";
+      productError.textContent = "";
+      document.getElementById("prodImage").value = "";
+
+      if (editData) {
+        document.getElementById("modalProductTitle").textContent = "Editar producto";
+        document.getElementById("productId").value  = editData._id;
+        document.getElementById("prodName").value   = editData.name || "";
+        document.getElementById("prodCategory").value = editData.category || "";
+        document.getElementById("prodBrand").value    = editData.brand || "";
+        document.getElementById("prodUnit").value     = editData.unit || "";
+        document.getElementById("prodPrice").value    = editData.price || "";
+      } else {
+        document.getElementById("modalProductTitle").textContent = "Nuevo producto";
+        document.getElementById("productId").value  = "";
+        document.getElementById("prodName").value   = "";
+        document.getElementById("prodCategory").value = "";
+        document.getElementById("prodBrand").value    = "";
+        document.getElementById("prodUnit").value     = "";
+        document.getElementById("prodPrice").value    = "";
+      }
+
+      openModal(modalProduct);
+    }
+
+    function cerrarModalProducto() {
+      closeModal(modalProduct);
+    }
+
+    if (btnNewProduct) {
+      btnNewProduct.addEventListener("click", () => {
+        if (!isOwner) return;
+        abrirModalProducto(null);
+      });
+    }
+
+    if (btnCancelProduct) {
+      btnCancelProduct.addEventListener("click", cerrarModalProducto);
+    }
+
+    productForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isOwner) return;
+
+      const id = document.getElementById("productId").value;
+
+      const formData = new FormData();
+      formData.append("storeId", storeId);
+      formData.append("name",     document.getElementById("prodName").value);
+      formData.append("category", document.getElementById("prodCategory").value);
+      formData.append("brand",    document.getElementById("prodBrand").value);
+      formData.append("unit",     document.getElementById("prodUnit").value);
+      formData.append("price",    document.getElementById("prodPrice").value);
+
+      const fileInput = document.getElementById("prodImage");
+      if (fileInput.files[0]) {
+        formData.append("image", fileInput.files[0]);
+      }
+
+      try {
+        const url    = id ? `/api/products/${id}` : "/api/products";
+        const method = id ? "PUT" : "POST";
+
+        const resp = await fetch(url, { method, body: formData });
+        const json = await resp.json();
+
+        if (!resp.ok) {
+          productError.style.display = "block";
+          productError.textContent = json.message || "Error al guardar producto";
+          console.error(json);
+          return;
+        }
+
+        cerrarModalProducto();
+        await cargarCatalogo();
+
+      } catch (err) {
+        console.error(err);
+        productError.style.display = "block";
+        productError.textContent = "Error de conexión";
+      }
+    });
+
+    productsListEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn || !isOwner) return;
+
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+
+      if (action === "edit") {
+        const found = catalogProducts.find(p => p._id === id);
+        if (found) abrirModalProducto(found);
+      } else if (action === "delete") {
+        if (!confirm("¿Eliminar este producto?")) return;
+        fetch(`/api/products/${id}`, { method: "DELETE" })
+          .then(r => r.json().then(json => ({ ok: r.ok, json })))
+          .then(async ({ ok, json }) => {
+            if (!ok) {
+              alert(json.message || "Error al eliminar");
+              return;
+            }
+            await cargarCatalogo();
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Error de conexión");
+          });
+      }
+    });
+
+    // ---------- PROMOS ----------
+    function abrirModalPromo(editData) {
+      promoError.style.display = "none";
+      promoError.textContent = "";
+
+      if (editData) {
+        document.getElementById("modalPromoTitle").textContent = "Editar promoción";
+        document.getElementById("promoId").value     = editData._id;
+        document.getElementById("promoTitle").value  = editData.title || "";
+        document.getElementById("promoProduct").value = editData.products || "";
+        document.getElementById("promoStart").value  =
+          editData.startsAt ? editData.startsAt.substring(0,10) : "";
+        document.getElementById("promoEnd").value    =
+          editData.endsAt   ? editData.endsAt.substring(0,10)   : "";
+      } else {
+        document.getElementById("modalPromoTitle").textContent = "Nueva promoción";
+        document.getElementById("promoId").value     = "";
+        document.getElementById("promoTitle").value  = "";
+        document.getElementById("promoProduct").value = "";
+        document.getElementById("promoStart").value  = "";
+        document.getElementById("promoEnd").value    = "";
+      }
+
+      openModal(modalPromo);
+    }
+
+    function cerrarModalPromo() {
+      closeModal(modalPromo);
+    }
+
+    if (btnNewPromo) {
+      btnNewPromo.addEventListener("click", () => {
+        if (!isOwner) return;
+        abrirModalPromo(null);
+      });
+    }
+
+    if (btnCancelPromo) {
+      btnCancelPromo.addEventListener("click", cerrarModalPromo);
+    }
+
+    promoForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isOwner) return;
+
+      const id = document.getElementById("promoId").value;
+
+      const body = {
+        storeId,
+        title:    document.getElementById("promoTitle").value,
+        products: document.getElementById("promoProduct").value,
+        startsAt: document.getElementById("promoStart").value,
+        endsAt:   document.getElementById("promoEnd").value,
+      };
+
+      try {
+        const url    = id ? `/api/promotions/${id}` : "/api/promotions";
+        const method = id ? "PUT" : "POST";
+
+        const resp = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const json = await resp.json();
+        if (!resp.ok) {
+          promoError.style.display = "block";
+          promoError.textContent = json.message || "Error al guardar promoción";
+          console.error(json);
+          return;
+        }
+
+        cerrarModalPromo();
+        await cargarCatalogo();
+
+      } catch (err) {
+        console.error(err);
+        promoError.style.display = "block";
+        promoError.textContent = "Error de conexión";
+      }
+    });
+
+    promosListEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn || !isOwner) return;
+
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+
+      if (action === "edit") {
+        const found = catalogPromotions.find(p => p._id === id);
+        if (found) abrirModalPromo(found);
+      } else if (action === "delete") {
+        if (!confirm("¿Eliminar esta promoción?")) return;
+        fetch(`/api/promotions/${id}`, { method: "DELETE" })
+          .then(r => r.json().then(json => ({ ok: r.ok, json })))
+          .then(async ({ ok, json }) => {
+            if (!ok) {
+              alert(json.message || "Error al eliminar");
+              return;
+            }
+            await cargarCatalogo();
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Error de conexión");
+          });
+      }
+    });
+
+    // ========== MODAL EDITAR TIENDA ==========
+    const modalStore    = document.getElementById("modalStore");
+    const storeForm     = document.getElementById("storeForm");
+    const storeError    = document.getElementById("storeError");
+    const btnCancelStore = document.getElementById("btnCancelStore");
+
+    function abrirModalStore() {
+    if (!isOwner || !currentStore) return;
+
+    // Rellenar campos con los datos actuales
+    document.getElementById("stNameInput").value     = currentStore.name || "";
+    document.getElementById("stAddressInput").value  = currentStore.address || "";
+    document.getElementById("stDistrictInput").value = currentStore.district || "";
+    document.getElementById("stCityInput").value     = currentStore.city || "";
+    document.getElementById("stPhoneInput").value    = currentStore.phone || "";
+
+    storeError.style.display = "none";
+    storeError.textContent = "";
+
+    modalStore.classList.add("mg-modal--open");
+    }
+
+    function cerrarModalStore() {
+    modalStore.classList.remove("mg-modal--open");
+    }
+
+    // Click en "Editar tienda"
+    if (btnEditStore) {
+    btnEditStore.addEventListener("click", () => {
+        if (!isOwner) return;
+        abrirModalStore();
+    });
+    }
+
+    // Botón cancelar
+    if (btnCancelStore) {
+    btnCancelStore.addEventListener("click", cerrarModalStore);
+    }
+
+    // Envío del formulario de tienda
+    if (storeForm) {
+    storeForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!isOwner) return;
+
+        const body = {
+        name:     document.getElementById("stNameInput").value.trim(),
+        address:  document.getElementById("stAddressInput").value.trim(),
+        district: document.getElementById("stDistrictInput").value.trim(),
+        city:     document.getElementById("stCityInput").value.trim(),
+        phone:    document.getElementById("stPhoneInput").value.trim()
+        };
+
+        try {
+        const resp = await fetch(`/api/store/${storeId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        });
+
+        const json = await resp.json();
+
+        if (!resp.ok) {
+            storeError.style.display = "block";
+            storeError.textContent = json.message || "Error al actualizar la tienda";
+            console.error(json);
+            return;
+        }
+
+        cerrarModalStore();
+        await cargarCatalogo(); // refresca los datos en la tarjeta
+        } catch (err) {
+        console.error(err);
+        storeError.style.display = "block";
+        storeError.textContent = "Error de conexión";
+        }
+    });
+    }
+
+
+    // Inicial
+    cargarCatalogo();
+  </script>
+
+</body>
+</html>

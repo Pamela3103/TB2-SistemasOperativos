@@ -1,0 +1,1349 @@
+:root {
+  --primary: #ff7043;
+  --primary-dark: #f4511e;
+  --bg: #f3f4f6;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --border-soft: #e5e7eb;
+}
+
+/* Fondo general */
+.auth-body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #ffe0b2 0, #f3f4f6 40%, #e5e7eb 100%);
+  color: var(--text-main);
+}
+
+/* Centrado de la tarjeta */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+/* Tarjeta principal */
+.auth-card {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  padding: 2.5rem 2.8rem;
+  max-width: 420px;
+  width: 100%;
+}
+
+/* Títulos */
+.auth-title {
+  margin: 0 0 0.25rem;
+  font-size: 2rem;
+  letter-spacing: 0.03em;
+}
+
+.auth-subtitle {
+  margin: 0 0 1.8rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* Formulario */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.auth-field label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+  background: #f9fafb;
+}
+
+.auth-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px rgba(255, 112, 67, 0.2);
+  background: #ffffff;
+}
+
+/* Botón principal */
+.auth-button {
+  margin-top: 0.6rem;
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 0.65rem 1rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #ffffff;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.1s ease;
+}
+
+.auth-button:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 12px 25px rgba(244, 81, 30, 0.35);
+  transform: translateY(-1px);
+}
+
+.auth-button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* Error de login/registro */
+.auth-error {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: #b91c1c;
+}
+
+/* Texto inferior */
+.auth-footer-text {
+  margin-top: 1.4rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.auth-link {
+  color: var(--primary-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* --------- Layout general feed --------- */
+
+.mg-body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #ffe8d2 0, #f5f5f7 40%, #f3f4f6 100%);
+}
+
+/* NAVBAR */
+
+.mg-navbar {
+  height: 64px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.07);
+  background-color: #ffffffcc;
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.mg-logo {
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #f97316;
+}
+
+.mg-navbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.mg-search {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  outline: none;
+  font-size: 0.9rem;
+  background-color: #f9fafb;
+}
+
+.mg-search:focus {
+  border-color: #fb923c;
+  box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.25);
+}
+
+.mg-navbar-right {
+  display: flex;
+  gap: 8px;
+}
+
+.mg-icon-btn {
+  border: none;
+  background: #f3f4f6;
+  border-radius: 999px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.mg-icon-btn:hover {
+  background: #e5e7eb;
+}
+
+/* CONTENIDO PRINCIPAL */
+
+.mg-main {
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 48px;
+}
+
+.mg-feed {
+  width: 100%;
+  max-width: 640px;
+}
+
+.mg-section-title {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.mg-empty-text {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+/* TARJETAS DE POST */
+
+.mg-post-card {
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+}
+
+.mg-post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mg-post-avatar img,
+.mg-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.mg-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fed7aa;
+  color: #9a3412;
+  font-weight: 700;
+}
+
+.mg-post-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.mg-post-author {
+  font-weight: 600;
+  color: #111827;
+}
+
+.mg-post-date {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.mg-post-content {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+/* IMAGEN DE LOS POSTS */
+
+.mg-post-media {
+  margin-top: 10px;
+  display: flex;               /* ya no grid */
+  justify-content: center;
+}
+
+.mg-post-media img {
+  display: block;
+  max-width: 75%;              /* la imagen no ocupa toda la tarjeta */
+  height: auto;                /* mantiene proporción */
+  max-height: 260px;           /* la hace "bajita" para que no llene la pantalla */
+  object-fit: contain;         /* NO recorta, solo escala */
+  border-radius: 12px;
+}
+
+
+.mg-post-footer {
+  margin-top: 12px;
+}
+
+.mg-post-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.mg-action-btn {
+  border: none;
+  background: #f3f4f6;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mg-action-btn span {
+  font-weight: 600;
+}
+
+.mg-action-btn:hover {
+  background: #e5e7eb;
+}
+.mg-feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mg-filter-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.mg-filter-btn {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.mg-filter-btn--active {
+  background: #fb923c;
+  color: white;
+}
+
+/* Botón nueva publicación */
+.mg-new-post-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: #fb923c;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 18px;
+  font-size: 1rem;
+}
+
+.mg-new-post-btn:hover {
+  background: #f97316;
+}
+
+/* ===== MODAL GENÉRICO ===== */
+.mg-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.40);
+  display: none;                  /* oculto por defecto */
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.mg-modal--open {
+  display: flex;                  /* se muestra centrado */
+}
+
+/* Caja blanca del modal (feed, posts, etc.) */
+.mg-modal-content {
+  background: #ffffff;
+  padding: 24px 28px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.25);
+}
+
+/* Formulario interno del modal */
+.mg-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mg-modal-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.mg-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  resize: vertical;
+  font: inherit;
+}
+
+.mg-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Botones */
+.mg-btn-primary {
+  background: #fb923c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.mg-btn-primary:hover {
+  background: #f97316;
+}
+
+.mg-btn-secondary {
+  background: #e5e7eb;
+  color: #111827;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.mg-new-post-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, #ff9a3c, #ff6a00);
+  border: none;
+  border-radius: 14px;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 15px rgba(255, 122, 0, 0.25);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.mg-new-post-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 122, 0, 0.35);
+}
+
+.mg-new-post-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: brightness(100) contrast(100);
+}
+
+/* ==========================
+   PERFIL DE USUARIO
+   ========================== */
+
+.mg-main-profile {
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 48px;
+}
+
+.mg-profile-layout {
+  width: 100%;
+  max-width: 980px;
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 24px;
+}
+
+/* Tarjeta lateral de usuario */
+
+.mg-profile-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+}
+
+.mg-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.mg-profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #fee2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mg-profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.mg-profile-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.mg-profile-username {
+  margin: 2px 0 4px;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.mg-profile-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.mg-profile-bio {
+  margin: 10px 0 16px;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.mg-profile-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mg-profile-stats > div {
+  flex: 1;
+  text-align: center;
+}
+
+.mg-profile-stat-number {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.mg-profile-stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* Botones del perfil */
+
+.mg-profile-btn-primary,
+.mg-profile-btn-outline {
+  width: 100%;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.mg-profile-btn-primary {
+  background: linear-gradient(90deg, #fb923c, #f97316);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+}
+
+.mg-profile-btn-primary:hover {
+  filter: brightness(1.03);
+}
+
+.mg-profile-btn-outline {
+  margin-top: 10px;
+  background: transparent;
+  color: #f97316;
+  border: 1px solid #fed7aa;
+}
+
+.mg-profile-btn-outline:hover {
+  background: #fff7ed;
+}
+
+/* Columna derecha */
+
+.mg-profile-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Tarjeta de tienda */
+
+.mg-store-card {
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+}
+
+.mg-store-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.mg-store-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.mg-store-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 500;
+}
+
+.mg-store-text {
+  margin: 2px 0;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+/* Posts dentro de perfil */
+
+.mg-profile-posts .mg-section-title {
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .mg-profile-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mg-profile-card {
+    order: 1;
+  }
+
+  .mg-profile-right {
+    order: 2;
+  }
+}
+
+/* Panel flotante de notificaciones */
+.mg-notif-panel {
+  position: fixed;
+  top: 80px;              /* ajusta según la altura de tu navbar */
+  right: 40px;            /* que “cuelgue” cerca de la campanita */
+  width: 320px;
+  max-height: 420px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 14px 45px rgba(0, 0, 0, 0.18);
+  padding: 16px 18px;
+  z-index: 1000;
+  display: none;          /* JS lo cambia a block */
+  overflow-y: auto;
+}
+
+/* Cabecera del panel */
+.mg-notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.mg-notif-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Lista e items */
+.mg-notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mg-notif-item {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #fafafa;
+  font-size: 0.9rem;
+}
+
+.mg-notif-unread {
+  background: #fff4e8; /* un naranja muy suave */
+  border-left: 4px solid #ff9a3c;
+}
+
+.mg-notif-text {
+  margin-bottom: 4px;
+}
+
+.mg-notif-date {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+/* Mensaje cuando no hay notificaciones */
+.mg-notif-empty {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #888;
+  padding: 18px 10px;
+}
+
+/* Campanita con puntito cuando hay sin leer */
+.mg-has-unread {
+  position: relative;
+}
+
+.mg-has-unread::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff6a00;
+  box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.35);
+}
+
+/* Contenedor de comentarios debajo del post */
+.mg-comments-block {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Lista de comentarios */
+.mg-comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.mg-comments-empty {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+/* Cada comentario */
+.mg-comment-item {
+  font-size: 0.88rem;
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+
+.mg-comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.mg-comment-author {
+  font-weight: 600;
+}
+
+.mg-comment-date {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.mg-comment-body {
+  line-height: 1.3;
+}
+
+/* Caja para escribir nuevo comentario */
+.mg-comment-new {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.mg-comment-input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  font-size: 0.85rem;
+}
+
+.mg-comment-input:focus {
+  outline: none;
+  border-color: #ff9a3c;
+  box-shadow: 0 0 0 2px rgba(255, 154, 60, 0.2);
+}
+
+.mg-comment-send {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: linear-gradient(90deg, #ff9a3c, #ff6a00);
+  color: white;
+  font-weight: 600;
+}
+
+/* ================================
+   EDITAR PERFIL – MercaGo
+================================ */
+
+/* CONTENEDOR DE SETTINGS (usado también aquí) */
+.mg-settings-container {
+  width: 100%;
+  max-width: 560px;          /* más compacto */
+  margin: 40px auto;
+  padding: 32px 28px;
+  background: linear-gradient(135deg, #fff7ed, #f8fafc);
+  border-radius: 22px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+/* Avatar en pantalla de edición */
+.mg-edit-avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.mg-edit-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  object-fit: cover;        /* se recorta dentro del círculo sin deformarse */
+  background: #fee2e2;
+}
+
+/* Botón “Cambiar foto” */
+.mg-file-label {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  border: 1px solid #fb923c;
+  background-color: #fff7ed;
+  color: #c05621;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.mg-file-label:hover {
+  background-color: #fb923c;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(251, 146, 60, 0.35);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .mg-settings-container {
+    margin: 24px 16px;
+    padding: 24px 18px;
+    max-width: 100%;
+  }
+}
+
+
+
+/* Título */
+.mg-settings-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 32px;
+}
+/* Grupo de cada campo para dejar aire */
+.mg-form-group {
+  width: 100%;
+  max-width: 480px;     /* controla qué tan angosto se ven los inputs */
+  margin: 0 auto;       /* centra cada input */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Formulario */
+.mg-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Etiquetas */
+.mg-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+/* Inputs y textarea */
+.mg-input,
+.mg-textarea,
+.mg-file {
+  width: 100%;
+  font-size: 1rem;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  outline: none;
+  transition: 0.2s all ease;
+}
+
+.mg-input:focus,
+.mg-textarea:focus {
+  border-color: #fb923c;
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.25);
+}
+
+/* Textarea */
+.mg-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* Botón guardar */
+.mg-btn-save {
+  width: fit-content;
+  align-self: center;
+  background: #fb923c;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 26px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 8px 20px rgba(251, 146, 60, 0.25);
+}
+
+.mg-btn-save:hover {
+  background: #f97316;
+  transform: translateY(-2px);
+}
+
+.mg-btn-save:active {
+  transform: scale(0.97);
+}
+
+/* ================================
+   CATÁLOGO TIENDA – MercaGo
+================================ */
+
+.mg-store-main {
+  justify-content: center;
+}
+
+.mg-store-layout {
+  width: 100%;
+  max-width: 960px;
+}
+
+.mg-store-info {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+}
+
+.mg-store-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.mg-store-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.mg-store-pill {
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.mg-store-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.mg-store-text + .mg-store-text {
+  margin-top: 2px;
+}
+
+.mg-store-owner-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Productos & promos */
+/* TIENDA ASOCIADA — ESQUINA SUPERIOR DERECHA */
+.mg-store-header {
+  position: relative;
+}
+
+.mg-store-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #d1fae5;
+  color: #065f46;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.mg-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.mg-product-card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.mg-product-img-wrapper {
+  width: 100%;
+  padding-top: 60%;
+  position: relative;
+  background: #f3f4f6;
+}
+
+.mg-product-img-wrapper img,
+.mg-product-placeholder {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mg-product-img-wrapper img {
+  object-fit: cover;
+}
+
+.mg-product-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #9ca3af;
+}
+
+.mg-product-body {
+  padding: 10px 12px 12px;
+}
+
+.mg-product-name {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.mg-product-meta {
+  font-size: 0.8rem;
+  color: #6b7280;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.mg-product-price {
+  font-weight: 700;
+  color: #fb923c;
+  margin-bottom: 6px;
+}
+
+.mg-product-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.mg-promos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.mg-promo-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 10px 14px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+}
+
+.mg-promo-title {
+  font-weight: 600;
+  color: #111827;
+}
+
+.mg-promo-dates {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.mg-promo-actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+}
+
+.mg-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.8rem;
+  color: #fb923c;
+  cursor: pointer;
+}
+
+.mg-link-btn-danger {
+  color: #dc2626;
+}
+/* CONTENEDOR OSCURO MODAL 
+.mg-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.40);
+  display: none;                
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+*/
+
+.mg-modal--open {
+  display: flex;
+}
+
+/* Caja blanca del modal */
+.mg-modal-card {
+  width: 100%;
+  max-width: 700px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 40px; /* <-- antes era 24px 26px */
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.25);
+}
+
+
+.mg-modal-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #111827;
+}
+
+.mg-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.mg-modal-field label {
+  margin-left: 2px; /* da aire al texto */
+}
+
+.mg-input,
+.mg-textarea,
+.mg-modal select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+}
+
+
+/* Botones de la cabecera de secciones (Promos / Productos) */
+.mg-store-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 18px 0 10px;
+}
+
+.mg-store-section-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Chip botón “+ Agregar …” */
+.mg-store-chip-btn {
+  border-radius: 999px;
+  border: 1px solid #fb923c;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  background: #fff7ed;
+  color: #c05621;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.mg-store-chip-btn:hover {
+  background: #fb923c;
+  color: #ffffff;
+}
+
+/*Editar tienda - título*/
+.mg-store-header {
+  position: relative;
+}
+
+.mg-store-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #d1fae5;
+  color: #065f46;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.mg-modal-card {
+  width: 100%;
+  max-width: 700px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 40px;  /* espacio lateral para que los inputs no choquen */
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.25);
+}
+
+/*Resultados de búsqueda*/
+.mg-search-results {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 420px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  padding: 10px 0;
+  z-index: 100;
+}
+
+.mg-search-item {
+  padding: 10px 18px;
+  cursor: pointer;
+}
+
+.mg-search-item:hover {
+  background: #f3f4f6;
+}
+
+.hidden {
+  display: none;
+}
+
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .mg-settings-container {
+    margin: 20px;
+    padding: 28px;
+  }
+
+  .mg-settings-title {
+    font-size: 1.5rem;
+  }
+}
+

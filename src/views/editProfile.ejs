@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Editar perfil – MercaGo</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="mg-body">
+
+<header class="mg-navbar">
+  <div class="mg-navbar-left">
+    <span class="mg-logo">MercaGo</span>
+  </div>
+  <div class="mg-navbar-center"></div>
+  <div class="mg-navbar-right">
+    <button class="mg-icon-btn" onclick="window.location.href='/profile'">👤</button>
+  </div>
+</header>
+
+<!-- OJO: usamos mg-main para centrar el contenido -->
+<main class="mg-main">
+  <div class="mg-settings-container">
+
+    <h2 class="mg-settings-title">Editar perfil</h2>
+
+    <!-- AVATAR + botón de cambio -->
+    <div class="mg-edit-avatar-wrapper">
+      <img id="profilePreview" class="mg-edit-avatar" src="" alt="Foto de perfil">
+      <label for="profilePhoto" class="mg-file-label">Cambiar foto</label>
+      <input
+        id="profilePhoto"
+        name="profilePhoto"
+        class="mg-file"
+        type="file"
+        accept="image/*"
+        style="display:none;"
+      >
+    </div>
+
+    <form id="editProfileForm" class="mg-settings-form" enctype="multipart/form-data">
+
+        <div class="mg-form-group">
+        <label class="mg-label">Nombre</label>
+        <input id="name" class="mg-input" type="text">
+        </div>
+
+      <div class="mg-form-group">
+        <label class="mg-label" for="username">Username</label>
+        <input id="username" class="mg-input" type="text">
+      </div>
+
+      <div class="mg-form-group">
+        <label class="mg-label" for="bio">Bio</label>
+        <textarea id="bio" class="mg-textarea" rows="4"></textarea>
+      </div>
+
+      <button class="mg-btn-save" type="submit">Guardar cambios</button>
+      <p id="editError" class="mg-modal-error" style="display:none; text-align:center;"></p>
+
+    </form>
+
+  </div>
+</main>
+
+<script>
+  const userId = sessionStorage.getItem("userId");
+  if (!userId) window.location.href = "/login";
+
+  const nameInput      = document.getElementById("name");
+  const usernameInput  = document.getElementById("username");
+  const bioInput       = document.getElementById("bio");
+  const photoInput     = document.getElementById("profilePhoto");
+  const previewImg     = document.getElementById("profilePreview");
+  const editForm       = document.getElementById("editProfileForm");
+  const editError      = document.getElementById("editError");
+
+  // Placeholder por si no hay foto
+  function getPlaceholder(username = "U") {
+    const initial = username[0].toUpperCase();
+    return "https://via.placeholder.com/120/fee2e2/9a3412?text=" + encodeURIComponent(initial);
+  }
+
+  // Cargar datos actuales
+  async function cargarDatos() {
+    try {
+      const resp = await fetch(`/api/profile/${userId}`);
+      const json = await resp.json();
+
+      if (!resp.ok) {
+        console.error(json);
+        return;
+      }
+
+      const u = json.user;
+
+      nameInput.value     = u.name     || "";
+      usernameInput.value = u.username || "";
+      bioInput.value      = u.bio      || "";
+
+      if (u.profilePhoto) {
+        previewImg.src = u.profilePhoto;
+      } else {
+        previewImg.src = getPlaceholder(u.username || "U");
+      }
+    } catch (err) {
+      console.error("Error al cargar perfil para edición:", err);
+    }
+  }
+  cargarDatos();
+
+  // Preview al elegir nueva foto
+  photoInput.addEventListener("change", () => {
+    if (photoInput.files && photoInput.files[0]) {
+      const url = URL.createObjectURL(photoInput.files[0]);
+      previewImg.src = url;
+    }
+  });
+
+  // Enviar cambios
+  editForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    editError.style.display = "none";
+    editError.textContent = "";
+
+    try {
+      const formData = new FormData();
+      formData.append("userId",   userId);
+      formData.append("name",     nameInput.value.trim());
+      formData.append("username", usernameInput.value.trim());
+      formData.append("bio",      bioInput.value.trim());
+
+      if (photoInput.files.length > 0) {
+        formData.append("profilePhoto", photoInput.files[0]);
+      }
+
+      const resp = await fetch("/api/profile/update", {
+        method: "POST",
+        body: formData
+      });
+
+      const json = await resp.json();
+
+      if (resp.ok) {
+        window.location.href = "/profile";
+      } else {
+        console.error(json);
+        editError.style.display = "block";
+        editError.textContent = json.message || "Error al actualizar el perfil.";
+      }
+    } catch (err) {
+      console.error(err);
+      editError.style.display = "block";
+      editError.textContent = "Error de conexión al guardar.";
+    }
+  });
+</script>
+
+</body>
+</html>
