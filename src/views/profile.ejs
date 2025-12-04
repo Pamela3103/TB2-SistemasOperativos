@@ -14,13 +14,24 @@
     </div>
     <div class="mg-navbar-center">
       <input type="text" class="mg-search" placeholder="Buscar tiendas o usuarios...">
+      <div id="searchResults" class="mg-search-results hidden"></div>
     </div>
     <div class="mg-navbar-right">
       <button class="mg-icon-btn" onclick="window.location.href='/feed'">🏠</button>
-      <button class="mg-icon-btn">🔔</button>
+      <button class="mg-icon-btn" id="btnNotif">🔔</button>
       <button class="mg-icon-btn mg-icon-btn--active">👤</button>
     </div>
   </header>
+
+  <!-- PANEL DE NOTIFICACIONES -->
+  <div id="notifPanel" class="mg-notif-panel" style="display:none;">
+    <div class="mg-notif-header">
+      <h4>Notificaciones</h4>
+    </div>
+    <div id="notifList" class="mg-notif-list">
+      <!-- Se llena por JS -->
+    </div>
+  </div>
 
   <!-- CONTENIDO PERFIL -->
   <main class="mg-main mg-main-profile">
@@ -291,6 +302,185 @@
     }
 
     cargarPerfil();
+  </script>
+
+  <script>
+    // --------- CAMPANITA DE NOTIFICACIONES ----------
+    const btnNotif = document.getElementById("btnNotif");
+    const notifPanel = document.getElementById("notifPanel");
+    const notifList = document.getElementById("notifList");
+    let notifLoaded = false;
+
+    async function cargarNotificaciones() {
+      notifList.innerHTML = "<p class='mg-notif-empty'>Cargando...</p>";
+
+      try {
+        const resp = await fetch(`/api/notifications/${loggedUserId}`);
+        const json = await resp.json();
+
+        if (!resp.ok) {
+          console.error(json);
+          notifList.innerHTML = "<p class='mg-notif-empty'>Error al cargar notificaciones.</p>";
+          return;
+        }
+
+        const notifs = json.notifications || [];
+        if (!notifs.length) {
+          notifList.innerHTML = "<p class='mg-notif-empty'>No tienes notificaciones aún.</p>";
+          btnNotif.classList.remove("mg-has-unread");
+          return;
+        }
+
+        notifList.innerHTML = "";
+        let hasUnread = false;
+
+        notifs.forEach(n => {
+          const item = document.createElement("div");
+          item.className = "mg-notif-item" + (n.read ? "" : " mg-notif-unread");
+          if (!n.read) hasUnread = true;
+
+          const fromName =
+            (n.data && n.data.fromUser && (n.data.fromUser.name || n.data.fromUser.username)) ||
+            "Alguien";
+
+          let text;
+          if (n.type === "LIKE")      text = `${fromName} le dio like a tu publicación.`;
+          else if (n.type === "COMMENT") text = `${fromName} comentó tu publicación.`;
+          else if (n.type === "FOLLOW")  text = `${fromName} empezó a seguirte.`;
+          else                          text = "Nueva notificación.";
+
+          const fecha = new Date(n.createdAt).toLocaleString("es-PE", {
+            dateStyle: "short",
+            timeStyle: "short"
+          });
+
+          item.innerHTML = `
+            <div class="mg-notif-text">${text}</div>
+            <div class="mg-notif-date">${fecha}</div>
+          `;
+          notifList.appendChild(item);
+        });
+
+        if (hasUnread) {
+          btnNotif.classList.add("mg-has-unread");
+        } else {
+          btnNotif.classList.remove("mg-has-unread");
+        }
+
+      } catch (err) {
+        console.error(err);
+        notifList.innerHTML = "<p class='mg-notif-empty'>Error de conexión.</p>";
+      }
+    }
+
+    btnNotif.addEventListener("click", async () => {
+      const visible = notifPanel.style.display === "block";
+      if (visible) {
+        notifPanel.style.display = "none";
+        return;
+      }
+
+      notifPanel.style.display = "block";
+
+      if (!notifLoaded) {
+        await cargarNotificaciones();
+        notifLoaded = true;
+      } else {
+        await cargarNotificaciones();
+      }
+
+      // marcar como leídas
+      fetch(`/api/notifications/${loggedUserId}/read`, {
+        method: "POST"
+      }).catch(() => {});
+    });
+  </script>
+
+  <script>
+    // --------- BUSCADOR ----------
+    const searchInput = document.querySelector(".mg-search");
+    const searchResults = document.getElementById("searchResults");
+
+    let timeoutSearch = null;
+
+    searchInput.addEventListener("input", () => {
+      clearTimeout(timeoutSearch);
+      const q = searchInput.value.trim();
+
+      if (q.length < 2) {
+        searchResults.classList.add("hidden");
+        return;
+      }
+
+      timeoutSearch = setTimeout(() => {
+        buscar(q);
+      }, 200);
+    });
+
+    async function buscar(q) {
+      try {
+        const resp = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        const { stores, users } = await resp.json();
+
+        searchResults.innerHTML = "";
+
+        if (stores.length === 0 && users.length === 0) {
+          searchResults.innerHTML =
+            "<div class='mg-search-item'>Sin resultados</div>";
+          searchResults.classList.remove("hidden");
+          return;
+        }
+
+        // TIENDAS
+        if (stores.length > 0) {
+          const label = document.createElement("div");
+          label.className = "mg-search-item";
+          label.style.fontWeight = "700";
+          label.textContent = "Tiendas";
+          searchResults.appendChild(label);
+
+          stores.forEach(s => {
+            const item = document.createElement("div");
+            item.className = "mg-search-item";
+            item.textContent = s.name;
+            item.onclick = () => {
+              window.location.href = `/store/${s._id}`;
+            };
+            searchResults.appendChild(item);
+          });
+        }
+
+        // USUARIOS
+        if (users.length > 0) {
+          const label = document.createElement("div");
+          label.className = "mg-search-item";
+          label.style.fontWeight = "700";
+          label.textContent = "Personas";
+          searchResults.appendChild(label);
+
+          users.forEach(u => {
+            const item = document.createElement("div");
+            item.className = "mg-search-item";
+            item.textContent = u.name;
+            item.onclick = () => {
+              window.location.href = `/profile/${u._id}`;
+            };
+            searchResults.appendChild(item);
+          });
+        }
+
+        searchResults.classList.remove("hidden");
+
+      } catch (err) {
+        console.error("Error buscando:", err);
+      }
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!searchInput.contains(e.target)) {
+        searchResults.classList.add("hidden");
+      }
+    });
   </script>
 
 </body>
